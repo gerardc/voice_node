@@ -1,45 +1,39 @@
 var xml = require('xmlbuilder');
 
-var response = function() {
+var baseUrl = "/flow/conference/customer_leg/";
+
+function response() {
   return xml.create("Response");
 };
 
-var url = function(sid, ev) {
-  return process.env.URL + "/flow/conference/customer_leg/" + sid + "/" + ev;
-}
+function url(sid, ev) {
+  return baseUrl + sid + "/" + ev;
+};
 
 var workflow = {
-  initial: {
-    incoming_call: {
-      name: "greeting",
-      twiml: function(opts) {
-        return response()
-          .ele("Say", "Greeting").up()
-          .ele("Redirect", url(opts.sid, "greeted"))
-          .end()
-      }
+  incoming_call: {
+    name: "greeting",
+    twiml: function(opts) {
+      return response()
+        .ele("Say", "Greeting").up()
+        .ele("Redirect", url(opts.sid, "greeted"))
+        .end()
     }
   },
-  greeting: {
-    greeted: {
-      name: "queued",
-      twiml: function(opts) {
-        return response()
-          .ele("Enqueue", { waitUrl: url(opts.sid, "routing") }, "queue-1").up()
-          .ele("Dial").ele("Client", "gerard")
-          .end()
-      },
+  greeted: {
+    name: "queued",
+    twiml: function(opts) {
+      return response()
+        .ele("Enqueue", { waitUrl: url(opts.sid, "waiting") }, "queue-1").up()
+        .ele("Dial").ele("Client", "gerard")
+        .end()
     }
   },
-  queued: {
-    routing: {
-      name: "routing",
-      twiml: function(opts) {
-        return response()
-          .ele("Say", "leaving the queue").up()
-          .ele("Leave")
-          .end()
-      },
+  waiting: {
+    name: "queued",
+    twiml: function(opts) {
+      return response()
+        .ele("Play", 'http://com.twilio.music.classical.s3.amazonaws.com/ith_brahms-116-4.mp3').end()
     }
   }
 };

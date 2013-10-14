@@ -1,8 +1,8 @@
 var w = require("../workflows/conference/customer_leg");
 var store = require("../store");
 
-function nextState(workflow, state, ev) {
-  return workflow[state][ev];
+function nextState(workflow, key) {
+  return workflow[key];
 };
 
 function save(sid, body, twiml, state) {
@@ -13,36 +13,26 @@ function save(sid, body, twiml, state) {
   });
 };
 
-exports.incoming_call = function(req, res){
+function run_workflow(req, res, state) {
   var sid = req.body.CallSid;
-
-  s = nextState(w, "initial", "incoming_call");
-  twiml = s.twiml({sid: sid, number: "1234"}).toString();
+  var twiml = state.twiml({sid: sid, number: "1234"}).toString();
 
   console.log(req.body);
   console.log(twiml);
 
-  save(sid, req.body, twiml, s.name);
+  save(sid, req.body, twiml, state.name);
 
-  res.set({ 'Content-Type': 'text/xml' })
+  res.set({'Content-Type': 'text/xml'})
   res.send(twiml);
+}
+
+function incomingCall(req, res){
+  return run_workflow(req, res, nextState(w, "incoming_call"));
 };
 
-exports.flow = function(req, res){
-  var sid = req.body.CallSid;
-
-  store.read(sid)
-    .then(function(value) {
-      console.log("value is: " + value.state);
-      var s = nextState(w, value.state, req.params.event);
-      var twiml = s.twiml({sid: sid, number: "1234"}).toString();
-
-      console.log(req.body);
-      console.log(twiml);
-
-      save(sid, req.body, twiml, s.name);
-
-      res.set({ 'Content-Type': 'text/xml' })
-      res.send(twiml);
-    })
+function flow(req, res){
+  return run_workflow(req, res, nextState(w, req.params.event));
 };
+
+exports.incomingCall = incomingCall;
+exports.flow = flow;

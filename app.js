@@ -30,8 +30,7 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/:client_name', routes.index);
-app.post('/incoming_call', call.incoming_call);
-app.post('/incoming_call', call.incoming_call);
+app.post('/incoming_call', call.incomingCall);
 app.post('/flow/:workflow_type/:workflow/:sid/:event', call.flow);
 
 http.createServer(app).listen(app.get('port'), function(){
