@@ -1,6 +1,6 @@
 var util = require("../common");
 
-var url = util.build_url("flow", "conference", "customer_leg");
+var url = util.build_url("flow", "conference", "agent_leg");
 var response = util.response;
 
 var workflow = {
@@ -17,9 +17,10 @@ var workflow = {
     name: "queued",
     twiml: function(opts) {
       return response()
-        .ele("Enqueue", { waitUrl: url(opts.sid, "waiting") }, "queue-1").up()
-        .ele("Dial").ele("Client", "gerard")
-        .end()
+        .ele("Enqueue", { waitUrl: url(opts.sid, "waiting") }, "queue-1") .end()
+    },
+    after: function(opts) {
+      console.log("I'm here");
     }
   },
   waiting: {
