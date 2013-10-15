@@ -1,13 +1,16 @@
-var w = require("../workflows/conference/customer_leg");
 var store = require("../store");
 var utils = require("../workflows/common");
 
-var after_callback = utils.run_callback("after");
-var before_callback = utils.run_callback("before");
+var afterCallback = utils.runCallback("after");
+var beforeCallback = utils.runCallback("before");
 
-function nextState(workflow, key) {
+function getState(workflow, key) {
   return workflow[key];
 };
+
+function getWorkflow(type, name) {
+  return require(["../workflows", type, name].join("/"));
+}
 
 function save(sid, body, twiml, state) {
   store.write(sid, {
@@ -17,7 +20,7 @@ function save(sid, body, twiml, state) {
   });
 };
 
-function run_workflow(req, res, state) {
+function runWorkflow(req, res, state) {
   var sid = req.body.CallSid;
   store.read(sid).then(function(leg) {
     var twiml = state.twiml({sid: sid, number: "1234"}).toString();
@@ -25,23 +28,25 @@ function run_workflow(req, res, state) {
     console.log(req.body);
     console.log(twiml);
 
-    before_callback(state, leg);
+    beforeCallback(state, leg);
 
     save(sid, req.body, twiml, state.name);
 
     res.set({'Content-Type': 'text/xml'})
     res.send(twiml);
 
-    after_callback(state, leg);
+    afterCallback(state, leg);
   });
 }
 
 function incomingCall(req, res){
-  return run_workflow(req, res, nextState(w, "incoming_call"));
+  var w = getWorkflow("conference", "customer_leg");
+  return runWorkflow(req, res, getState(w, "incoming_call"));
 };
 
 function flow(req, res){
-  return run_workflow(req, res, nextState(w, req.params.event));
+  var w = getWorkflow(req.params.type, req.params.name);
+  return runWorkflow(req, res, getState(w, req.params.event));
 };
 
 exports.incomingCall = incomingCall;

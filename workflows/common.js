@@ -11,12 +11,18 @@ exports.response = function() {
 exports.buildUrl = function() {
   var base = argsToArray(arguments);
   return function() {
-    return "/" + base.concat(argsToArray(arguments)).join("/");
+    return process.env.URL + "/" + base.concat(argsToArray(arguments)).join("/");
   };
 };
 
-exports.run_callback = function(type) {
+exports.runCallback = function(type) {
   return function(state, leg) {
-    state.hasOwnProperty(type) && state["type"](leg);
+    return state.hasOwnProperty(type) && state[type](leg);
+  }
+};
+
+exports.callAttr = function(leg) {
+  return function(key) {
+    return leg.body.hasOwnProperty(key) && leg.body[key];
   }
 }

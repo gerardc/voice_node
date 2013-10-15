@@ -9,8 +9,6 @@ var call = require('./routes/call');
 var http = require('http');
 var path = require('path');
 
-var twilio_config = require("./twilio.json")
-
 var app = express();
 
 // all environments
@@ -31,8 +29,11 @@ if ('development' == app.get('env')) {
 
 app.get('/:client_name', routes.index);
 app.post('/incoming_call', call.incomingCall);
-app.post('/flow/:workflow_type/:workflow/:sid/:event', call.flow);
+app.post('/flow/:type/:name/:sid/:event', call.flow);
 
-http.createServer(app).listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
-});
+exports.app = app;
+exports.start = function() {
+  http.createServer(app).listen(app.get('port'), function(){
+    console.log('Express server listening on port ' + app.get('port'));
+  });
+}
