@@ -1,4 +1,5 @@
 var xml = require('xmlbuilder');
+var url = require('url');
 
 function argsToArray(a) {
   return Array.prototype.slice.call(a);
@@ -10,8 +11,13 @@ exports.response = function() {
 
 exports.buildUrl = function() {
   var base = argsToArray(arguments);
-  return function() {
-    return process.env.URL + "/" + base.concat(argsToArray(arguments)).join("/");
+  return function(ev, opts) {
+    return url.format({
+      protocol: "http",
+      hostname: process.env.HOST,
+      pathname: base.concat([ev]).join("/"),
+      query: opts || {}
+    });
   };
 };
 
@@ -23,6 +29,6 @@ exports.runCallback = function(type) {
 
 exports.callAttr = function(leg) {
   return function(key) {
-    return leg.body.hasOwnProperty(key) && leg.body[key];
+    return leg.request.body.hasOwnProperty(key) && leg.request.body[key];
   }
 }

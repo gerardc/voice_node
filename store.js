@@ -16,7 +16,7 @@ function read(key) {
 function read_full(key) {
   return lrange(key, 0, -1)
     .then(function(reply) {
-      return reply;
+      return _.map(reply, function(r) { return JSON.parse(r)});
     });
 };
 

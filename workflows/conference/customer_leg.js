@@ -11,7 +11,7 @@ var workflow = {
     twiml: function(opts) {
       return response()
         .ele("Say", "Greeting").up()
-        .ele("Redirect", url(opts.sid, "greeted"))
+        .ele("Redirect", url("greeted"))
         .end()
     }
   },
@@ -19,13 +19,13 @@ var workflow = {
     name: "queued",
     twiml: function(opts) {
       return response()
-        .ele("Enqueue", { waitUrl: url(opts.sid, "waiting") }, "queue-1").up()
+        .ele("Enqueue", { waitUrl: url("waiting") }, "queue-1").up()
         .ele("Dial").ele("Client", "gerard")
         .end()
     },
     after: function(leg) {
       var sid = util.callAttr(leg)("CallSid");
-      return router.dialAgent(agentUrl(sid, "agent_picks_up"));
+      return router.dialAgent(agentUrl("agent_picks_up", { incoming_sid: sid }));
     }
   },
   waiting: {

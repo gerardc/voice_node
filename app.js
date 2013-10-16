@@ -28,8 +28,9 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/:client_name', routes.index);
-app.post('/incoming_call', call.incomingCall);
-app.post('/flow/:type/:name/:sid/:event', call.flow);
+app.post('/incoming_call', call.incoming);
+app.post('/flow/:type/:name/:event', call.flow);
+app.get('/call/:sid', call.read);
 
 exports.app = app;
 exports.start = function() {
