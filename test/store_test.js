@@ -1,4 +1,4 @@
-var assert = require("should");
+var assert = require("assert");
 var store = require("../store");
 
 describe('Store', function(){
@@ -15,7 +15,7 @@ describe('Store', function(){
             return store.read("blah");
           })
           .then(function(val) {
-            val.should.equal(5);
+            assert.equal(5, val);
             done();
           });
       });
@@ -30,7 +30,7 @@ describe('Store', function(){
             return store.read("blah");
           })
           .then(function(val) {
-            val.should.equal(10);
+            assert.equal(10, val);
             done();
           });
       });
@@ -46,9 +46,7 @@ describe('Store', function(){
           return store.read_full("blah");
         })
         .then(function(val) {
-          val.length.should.eql(2);
-          val.should.includeEql(5);
-          val.should.includeEql(10);
+          assert.deepEqual([10, 5], val);
           done();
         });
     });
