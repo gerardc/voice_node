@@ -13,5 +13,8 @@
     "redis": "*",
     "underscore": "*",
     "rsvp": "*"
+  },
+  "devDependencies": {
+    "supertest": "*"
   }
 }

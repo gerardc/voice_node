@@ -14,7 +14,7 @@ function getWorkflow(type, name) {
 }
 
 function save(sid, req, twiml, state) {
-  store.write(sid, {
+  return store.write(sid, {
     request: {
       query: req.query,
       body: req.body
@@ -33,7 +33,7 @@ function read(req, res) {
 
 function runWorkflow(req, res, state) {
   var sid = req.body.CallSid;
-  store.read(sid).then(function(leg) {
+  return store.read(sid).then(function(leg) {
     var twiml = state.twiml({sid: sid, number: "1234"}).toString();
 
     console.log(req.query);
@@ -48,6 +48,8 @@ function runWorkflow(req, res, state) {
     res.send(twiml);
 
     afterCallback(state, leg);
+
+    return res;
   });
 }
 
